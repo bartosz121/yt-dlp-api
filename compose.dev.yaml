@@ -1,0 +1,46 @@
+services:
+  yt_dlp_api:
+    environment:
+      - ENVIRONMENT=DEVELOPMENT
+    command:
+      [
+        "granian",
+        "--interface",
+        "asgi",
+        "--workers",
+        "1",
+        "--factory",
+        "yt_dlp_api.main:create_app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--log-level",
+        "debug",
+        "--reload",
+        "--reload-paths",
+        "/app/yt_dlp_api",
+      ]
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./
+          target: /app
+          ignore:
+            - .git/
+            - .venv/
+        - action: rebuild
+          path: uv.lock
+  yt_dlp_api_worker:
+    environment:
+      - ENVIRONMENT=DEVELOPMENT
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./
+          target: /app
+          ignore:
+            - .git/
+            - .venv/
+        - action: rebuild
+          path: uv.lock

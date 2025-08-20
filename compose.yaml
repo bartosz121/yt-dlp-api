@@ -1,0 +1,51 @@
+x-yt-dlp-api-environment: &yt-dlp-api-environment
+  environment:
+    - ENVIRONMENT=PRODUCTION
+    - DB_HOST=postgres
+    - DB_PORT=5432
+    - DB_NAME=yt_dlp_api_db
+    - DB_USER=yt_dlp_api
+    - DB_PASSWORD=password123
+
+services:
+  yt_dlp_api:
+    image: yt_dlp_api:latest
+    build: .
+    <<: *yt-dlp-api-environment
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - yt_dlp_api_worker
+    command:
+      [
+        "granian",
+        "--interface",
+        "asgi",
+        "--workers",
+        "4",
+        "--factory",
+        "yt_dlp_api.main:create_app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--log-level",
+        "info",
+      ]
+  yt_dlp_api_worker:
+    image: yt_dlp_api:latest
+    build: .
+    <<: *yt-dlp-api-environment
+    depends_on:
+      - postgres
+    command: ["python", "-m", "yt_dlp_api.worker"]
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: yt_dlp_api_db
+      POSTGRES_USER: yt_dlp_api
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
