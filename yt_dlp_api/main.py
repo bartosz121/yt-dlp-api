@@ -19,6 +19,7 @@ def create_app() -> "Litestar":
     from litestar_granian import GranianPlugin
 
     from yt_dlp_api.controllers.jobs import JobsController
+    from yt_dlp_api.controllers.transcription import TranscriptionController
     from yt_dlp_api.controllers.yt_dlp import YtDlpController
 
     def app_exception_handler(request: Request, exc: HTTPException) -> Response:
@@ -49,9 +50,12 @@ def create_app() -> "Litestar":
             StructlogPlugin(),
             OpenTelemetryPlugin(OpenTelemetryConfig()),
         ],
-        route_handlers=[index, PrometheusController, JobsController, YtDlpController],
-        middleware=[
-            PrometheusConfig(app_name="yt_dlp_api", prefix="yt_dlp_api").middleware
+        route_handlers=[
+            index,
+            PrometheusController,
+            JobsController,
+            YtDlpController,
+            TranscriptionController,
         ],
         on_startup=[on_startup],
     )

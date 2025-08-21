@@ -1,7 +1,6 @@
 import os
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Self
 
 import structlog
 
@@ -43,10 +42,12 @@ class Environment(StrEnum):
 class Settings:
     ENVIRONMENT: Environment = field(default=Environment.DEVELOPMENT)
     PREFERREDCODEC: str = field(default="m4a")
-    DOWNLOAD_PATH: str = field(default="/tmp")
+    DOWNLOAD_PATH: str = field(default="/mnt/storage")
     DB_URL: str = field(
         default=f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
     )
+    ASSEMBLY_AI_BASE_URL: str = field(default="https://api.assemblyai.com")
+    ASSEMBLY_AI_KEY: str = field(default_factory=lambda: os.environ["ASSEMBLY_AI_KEY"])
 
 
 settings = Settings()

@@ -48,4 +48,6 @@ WORKDIR /app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
+RUN mkdir -p /mnt/storage
+
 CMD [ "granian", "--interface", "asgi", "--workers", "4", "--factory", "yt_dlp_api.main:create_app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info" ]

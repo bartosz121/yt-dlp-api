@@ -6,6 +6,7 @@ x-yt-dlp-api-environment: &yt-dlp-api-environment
     - DB_NAME=yt_dlp_api_db
     - DB_USER=yt_dlp_api
     - DB_PASSWORD=password123
+    - ASSEMBLY_AI_KEY=
 
 services:
   yt_dlp_api:
@@ -14,6 +15,8 @@ services:
     <<: *yt-dlp-api-environment
     ports:
       - "8000:8000"
+    volumes:
+      - /tmp/yt-dlp-api-storage:/mnt/storage
     depends_on:
       - postgres
       - yt_dlp_api_worker
@@ -37,6 +40,8 @@ services:
     image: yt_dlp_api:latest
     build: .
     <<: *yt-dlp-api-environment
+    volumes:
+      - /tmp/yt-dlp-api-storage:/mnt/storage
     depends_on:
       - postgres
     command: ["python", "-m", "yt_dlp_api.worker"]

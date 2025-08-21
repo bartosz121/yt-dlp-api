@@ -7,26 +7,7 @@ from pathlib import Path
 import pytest
 
 from yt_dlp_api.post_processing import remove_silence, speed_up_audio
-
-SAMPLES_DIR = Path(__file__).parent / "samples"
-SAMPLE_WITH_SILENCE = SAMPLES_DIR / "sample_with_silence.m4a"
-SAMPLE_FOR_SPEEDUP = SAMPLES_DIR / "sample_for_speedup.m4a"
-
-
-def _get_duration(file_path: Path) -> float:
-    """Returns the duration of an audio file in seconds."""
-    cmd = [
-        "ffprobe",
-        "-v",
-        "error",
-        "-show_entries",
-        "format=duration",
-        "-of",
-        "default=noprint_wrappers=1:nokey=1",
-        str(file_path),
-    ]
-    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    return float(result.stdout)
+from yt_dlp_api.utils import get_audio_file_duration
 
 
 def _get_total_silence_duration(file_path: Path) -> float:
@@ -52,13 +33,13 @@ def _get_total_silence_duration(file_path: Path) -> float:
     not shutil.which("ffmpeg") or not shutil.which("ffprobe"),
     reason="ffmpeg/ffprobe not installed",
 )
-def test_remove_silence_with_output_path():
+def test_remove_silence_with_output_path(SAMPLE_WITH_SILENCE: Path):
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir_path = Path(tmpdir)
         temp_audio_path = tmpdir_path / "test.m4a"
 
         shutil.copy(SAMPLE_WITH_SILENCE, temp_audio_path)
-        original_duration = _get_duration(temp_audio_path)
+        original_duration = get_audio_file_duration(temp_audio_path)
         total_silence = _get_total_silence_duration(temp_audio_path)
         expected_duration = original_duration - total_silence
 
@@ -70,22 +51,22 @@ def test_remove_silence_with_output_path():
 
         assert returned_path == output_path
         assert output_path.exists()
-        new_duration = _get_duration(output_path)
+        new_duration = get_audio_file_duration(output_path)
         assert abs(new_duration - expected_duration) < 0.5
-        assert _get_duration(temp_audio_path) == original_duration
+        assert get_audio_file_duration(temp_audio_path) == original_duration
 
 
 @pytest.mark.skipif(
     not shutil.which("ffmpeg") or not shutil.which("ffprobe"),
     reason="ffmpeg/ffprobe not installed",
 )
-def test_speed_up_audio_with_output_path():
+def test_speed_up_audio_with_output_path(SAMPLE_FOR_SPEEDUP: Path):
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir_path = Path(tmpdir)
         temp_audio_path = tmpdir_path / "test.m4a"
 
         shutil.copy(SAMPLE_FOR_SPEEDUP, temp_audio_path)
-        original_duration = _get_duration(temp_audio_path)
+        original_duration = get_audio_file_duration(temp_audio_path)
         speed = 2.0
 
         output_path = tmpdir_path / "output.m4a"
@@ -97,7 +78,7 @@ def test_speed_up_audio_with_output_path():
         assert returned_path == output_path
         assert output_path.exists()
 
-        new_duration = _get_duration(output_path)
+        new_duration = get_audio_file_duration(output_path)
         expected_duration = original_duration / speed
         assert abs(new_duration - expected_duration) < 0.1
-        assert _get_duration(temp_audio_path) == original_duration
+        assert get_audio_file_duration(temp_audio_path) == original_duration
