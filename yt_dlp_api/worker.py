@@ -4,8 +4,8 @@ import os
 import structlog
 from chancy import Chancy, Queue, QueuedJob, Worker, job
 
-from .yt_dlp import download_video
-from .post_processing import remove_silence, speed_up_audio
+from yt_dlp_api.post_processing import remove_silence, speed_up_audio
+from yt_dlp_api.yt_dlp import download_video
 
 log: structlog.stdlib.BoundLogger = structlog.get_logger()
 
