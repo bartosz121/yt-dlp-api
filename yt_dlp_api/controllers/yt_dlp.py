@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from chancy.job import QueuedJob
 from litestar import Controller, post
 
-from yt_dlp_api.worker import chancy, download
+from yt_dlp_api.worker import chancy, download_and_post_process
 
 
 @dataclass
@@ -28,5 +28,7 @@ class YtDlpController(Controller):
     async def schedule_download(
         self, data: ScheduleDownloadRequest
     ) -> ScheduleDownloadResponse:
-        job = await chancy.push(download.job.with_kwargs(video_url=data.url))
+        job = await chancy.push(
+            download_and_post_process.job.with_kwargs(video_url=data.url)
+        )
         return ScheduleDownloadResponse(job.identifier)
