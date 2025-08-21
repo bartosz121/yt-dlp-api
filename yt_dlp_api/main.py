@@ -1,4 +1,3 @@
-import os
 from typing import TYPE_CHECKING
 
 from litestar.exceptions import HTTPException
@@ -10,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def create_app() -> "Litestar":
-    from litestar import Litestar, Request, Response, get, post
+    from litestar import Litestar, Request, Response, get
     from litestar.contrib.opentelemetry import OpenTelemetryConfig, OpenTelemetryPlugin
     from litestar.openapi.config import OpenAPIConfig
     from litestar.openapi.plugins import SwaggerRenderPlugin
@@ -18,11 +17,12 @@ def create_app() -> "Litestar":
     from litestar.plugins.structlog import StructlogPlugin
     from litestar_granian import GranianPlugin
 
+    from yt_dlp_api.config import settings
     from yt_dlp_api.controllers.jobs import JobsController
     from yt_dlp_api.controllers.transcription import TranscriptionController
     from yt_dlp_api.controllers.yt_dlp import YtDlpController
 
-    def app_exception_handler(request: Request, exc: HTTPException) -> Response:
+    def app_exception_handler(request: Request, exc: HTTPException) -> Response[dict[str, str]]:  # pyright: ignore[reportMissingTypeArgument, reportUnknownParameterType]
         return Response(
             content={
                 "error": get_http_status_message(exc.status_code),
@@ -35,10 +35,8 @@ def create_app() -> "Litestar":
     async def index() -> dict[str, str]:
         return {"msg": "ok"}
 
-    def on_startup():
-        os.makedirs("/tmp/yt-dlp-downloads", exist_ok=True)
-
     app = Litestar(
+        debug=settings.ENVIRONMENT.is_qa,
         openapi_config=OpenAPIConfig(
             title="yt-dlp-api",
             version="0.0.1",
@@ -57,7 +55,8 @@ def create_app() -> "Litestar":
             YtDlpController,
             TranscriptionController,
         ],
-        on_startup=[on_startup],
+        middleware=[PrometheusConfig(app_name="yt_dlp_api", prefix="yt_dlp_api").middleware],
+        on_startup=[],
     )
 
     return app
