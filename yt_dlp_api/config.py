@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass, field, fields
 from enum import StrEnum
 from typing import Self
@@ -41,3 +42,11 @@ class Environment(StrEnum):
 @dataclass
 class Settings:
     ENVIRONMENT: Environment = field(default=Environment.DEVELOPMENT)
+    PREFERREDCODEC: str = field(default="m4a")
+    DOWNLOAD_PATH: str = field(default="/tmp")
+    DB_URL: str = field(
+        default=f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    )
+
+
+settings = Settings()
