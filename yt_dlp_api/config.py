@@ -41,6 +41,9 @@ class Environment(StrEnum):
 @dataclass
 class Settings:
     ENVIRONMENT: Environment = field(default=Environment.DEVELOPMENT)
+    AUTHORIZATION_SECRET: str = field(
+        default="3f698872043d4b21c1e7b5284c652b57cdd47eb8513bef6dedd5b4a4fe71a239"
+    )
     PREFERREDCODEC: str = field(default="m4a")
     DOWNLOAD_PATH: str = field(default="/mnt/storage")
     DB_URL: str = field(
