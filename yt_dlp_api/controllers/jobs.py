@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Annotated
 
-from chancy.job import QueuedJob, Reference
+from chancy.job import QueuedJob, Reference  # pyright: ignore[reportMissingTypeStubs]
 from litestar import Controller, get
 from litestar.exceptions import HTTPException
 from litestar.params import Parameter
