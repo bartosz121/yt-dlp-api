@@ -11,6 +11,7 @@ dependencies = [
     "litestar-granian>=0.14.2",
     "litestar[annotated-types,attrs,opentelemetry,prometheus,sqlalchemy,structlog]>=2.17.0",
     "psycopg[c]>=3.2.9",
+    "pytest-asyncio>=1.1.0",
     "python-dotenv>=1.1.1",
     "uvloop>=0.21.0",
     "yt-dlp>=2025.8.11",
@@ -28,3 +29,33 @@ dev = [
     "ruff>=0.12.8",
     "vcrpy>=7.0.0",
 ]
+
+[tool.ruff]
+line-length = 99
+
+[tool.ruff.lint]
+extend-select = ["Q", "RUF100", "C90", "UP", "I", "T20"]
+isort = { combine-as-imports = true }
+mccabe = { max-complexity = 15 }
+
+[tool.pyright]
+pythonVersion = "3.13"
+typeCheckingMode = "strict"
+venvPath = ".venv"
+reportUnnecessaryTypeIgnoreComment = true
+
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self\\.debug",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
